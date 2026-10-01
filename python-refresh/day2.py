@@ -1,19 +1,23 @@
 import csv
 
 def load_expenses():
-    with open("expenses.csv", "r") as file:
-        reader = csv.DictReader(file)
-        expenses = []
-        for row in reader:
-            expenses.append({"name": row["name"], "amount": float(row["amount"])})
+    expenses = []
+    try:
+        with open("expenses.csv", "r") as file:
+            reader = csv.DictReader(file)
+            
+            for row in reader:
+                expenses.append({"name": row["name"], "amount": float(row["amount"]), "category": row.get("category", "Uncategorized")})
+    except FileNotFoundError:
+        pass
     return expenses
 
 def save_expenses(expenses):
     with open("expenses.csv", "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=["name", "amount"])
+        writer = csv.DictWriter(file, fieldnames=["name", "amount", "category"])
         writer.writeheader()
         for expense in expenses:
-            writer.writerow({"name": expense["name"], "amount": expense["amount"]})
+            writer.writerow({"name": expense["name"], "amount": expense["amount"], "category": expense["category"]})
 
 def calculate_total(expenses):
     total = 0
@@ -55,12 +59,16 @@ def add_expense(expenses):
     while not valid_amount:
         try:
             expense_amount = float(input("Enter the amount of the expense: "))
-            valid_amount = True
+            if expense_amount > 0:
+                valid_amount = True
+            else:
+                print("Invalid input.")
         except ValueError:
             print("Invalid input.")
-            
 
-    expenses.append({"name": expense_name, "amount": expense_amount})
+    expense_category = input("Enter the category of the expense: ") 
+
+    expenses.append({"name": expense_name, "amount": expense_amount, "category": expense_category})
     save_expenses(expenses)
 
 def get_budget():
@@ -79,7 +87,7 @@ def check_budget(total, budget):
 
 def display_expenses(expenses):
     for expense in expenses:
-        print(f"{expense['name']}: ${expense['amount']:.2f}")
+        print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
 
 def count_expenses(expenses):
     return len(expenses)
@@ -106,6 +114,19 @@ def sort_expenses_by_amount(expenses):
     sorted_expenses = sorted(expenses, key=lambda expense: expense['amount'], reverse=descending)
     return sorted_expenses
 
+def calculate_category_totals(expenses):
+    category_totals = {}
+    for expense in expenses:
+        category = expense["category"]
+        if category not in category_totals:
+            category_totals[category] = 0
+        category_totals[category] += expense["amount"]
+    return category_totals
+
+def display_category_totals(category_totals):
+    for category, total in category_totals.items():
+        print(f"{category}: ${total:.2f}")
+
 def display_menu():
     print("===== Expense Tracker =====")
     print("1. Add expense")
@@ -113,15 +134,16 @@ def display_menu():
     print("3. View summary")
     print("4. Filter expenses")
     print("5. Sort expenses")
-    print("6. Exit")
+    print("6. View category totals")
+    print("7. Exit")
 
 def get_menu_choice():
     display_menu()
     while True:
-        choice = input("Enter your choice (1-6): ")
-        if choice in ['1', '2', '3', '4', '5', '6']:
+        choice = input("Enter your choice (1-7): ")
+        if choice in ['1', '2', '3', '4', '5', '6', '7']:
             return choice
-        print("Invalid choice. Please enter a number between 1 and 6.")
+        print("Invalid choice. Please enter a number between 1 and 7.")
     
 def display_summary(expenses):
     budget = get_budget()
@@ -166,12 +188,15 @@ def main():
             if not filtered_expenses:
                 print("No expenses found matching that amount.")
             for expense in filtered_expenses:
-                print(f"{expense['name']}: ${expense['amount']:.2f}")
+                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
         elif choice == '5':
             sorted_expenses = sort_expenses_by_amount(expenses)
             for expense in sorted_expenses:
-                print(f"{expense['name']}: ${expense['amount']:.2f}")
+                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
         elif choice == '6':
+            category_totals = calculate_category_totals(expenses)
+            display_category_totals(category_totals)
+        elif choice == '7':
             print("Exiting the program.")
             break
 

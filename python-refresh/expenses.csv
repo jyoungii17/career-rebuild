@@ -1,9 +1,13 @@
-name,amount
-Groceries,75.5
-Gas,40.0
-Coffee,5.25
-Phone Bill,60.0
-Internet,70.0
-Water,35.0
-pt,150.0
-Bananas,10.0
+name,amount,category
+Groceries,75.5,Uncategorized
+Gas,40.0,Uncategorized
+Coffee,5.25,Uncategorized
+Phone Bill,60.0,Uncategorized
+Internet,70.0,Uncategorized
+Water,35.0,Uncategorized
+pt,150.0,Uncategorized
+Bananas,10.0,Uncategorized
+Baco Tell,420.69,Uncategorized
+Pizza,20.0,Food
+Burger,15.0,Food
+Fries,12.5,Food
