@@ -1,4 +1,5 @@
 import csv
+from datetime import date
 
 def load_expenses():
     expenses = []
@@ -7,17 +8,27 @@ def load_expenses():
             reader = csv.DictReader(file)
             
             for row in reader:
-                expenses.append({"name": row["name"], "amount": float(row["amount"]), "category": row.get("category", "Uncategorized")})
+                expenses.append({
+                    "name": row["name"], 
+                    "amount": float(row["amount"]), 
+                    "category": row.get("category", "Uncategorized"), 
+                    "date": row.get("date", "Unknown")
+                })
     except FileNotFoundError:
         pass
     return expenses
 
 def save_expenses(expenses):
     with open("expenses.csv", "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=["name", "amount", "category"])
+        writer = csv.DictWriter(file, fieldnames=["name", "amount", "category", "date"])
         writer.writeheader()
         for expense in expenses:
-            writer.writerow({"name": expense["name"], "amount": expense["amount"], "category": expense["category"]})
+            writer.writerow({
+                "name": expense["name"], 
+                "amount": expense["amount"], 
+                "category": expense["category"], 
+                "date": expense["date"]
+            })
 
 def calculate_total(expenses):
     total = 0
@@ -52,6 +63,7 @@ def find_smallest_expense(expenses):
     return smallest_expense
 
 def add_expense(expenses):
+    
     print("Enter the name of expense: ")
     expense_name = input()
     
@@ -67,8 +79,13 @@ def add_expense(expenses):
             print("Invalid input.")
 
     expense_category = input("Enter the category of the expense: ") 
-
-    expenses.append({"name": expense_name, "amount": expense_amount, "category": expense_category})
+    expense_date = date.today().isoformat()
+    expenses.append({
+        "name": expense_name, 
+        "amount": expense_amount, 
+        "category": expense_category, 
+        "date": expense_date
+    })
     save_expenses(expenses)
 
 def get_budget():
@@ -87,7 +104,7 @@ def check_budget(total, budget):
 
 def display_expenses(expenses):
     for expense in expenses:
-        print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
+        print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']} - {expense['date']}")
 
 def count_expenses(expenses):
     return len(expenses)
@@ -146,6 +163,9 @@ def get_menu_choice():
         print("Invalid choice. Please enter a number between 1 and 7.")
     
 def display_summary(expenses):
+    today = date.today().isoformat()
+    print(f"Date: {today}")
+
     budget = get_budget()
     total = calculate_total(expenses)
     print(f"Total Expenses: ${total:.2f}")
@@ -188,11 +208,11 @@ def main():
             if not filtered_expenses:
                 print("No expenses found matching that amount.")
             for expense in filtered_expenses:
-                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
+                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']} - {expense['date']}")
         elif choice == '5':
             sorted_expenses = sort_expenses_by_amount(expenses)
             for expense in sorted_expenses:
-                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']}")
+                print(f"{expense['name']}: ${expense['amount']:.2f} - {expense['category']} - {expense['date']}")
         elif choice == '6':
             category_totals = calculate_category_totals(expenses)
             display_category_totals(category_totals)
