@@ -7,14 +7,25 @@ def load_expenses():
             reader = csv.DictReader(file)
             
             for row in reader:
-                expenses.append({
-                    "name": row["name"], 
-                    "amount": float(row["amount"]), 
-                    "category": row.get("category", "Uncategorized"), 
-                    "date": row.get("date", "Unknown")
-                })
+                expense_name = row["name"].strip()
+                expense_category = row.get("category", "Uncategorized").strip()
+                if expense_name == "":
+                    print("Skipping expense with invalid name.")
+                    continue
+                if expense_category == "":
+                    print("Skipping expense with invalid category.")
+                    continue
+                try:
+                    expenses.append({
+                        "name": expense_name, 
+                        "amount": float(row["amount"]), 
+                        "category": expense_category, 
+                        "date": row.get("date", "Unknown")
+                    })
+                except ValueError:
+                    print("Skipping invalid expense amount.")
     except FileNotFoundError:
-        pass
+        print("No expense file found. Starting with an empty list.")
     return expenses
 
 def save_expenses(expenses):
