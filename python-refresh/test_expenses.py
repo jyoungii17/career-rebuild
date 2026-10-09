@@ -6,6 +6,8 @@ from reports import (
     calculate_category_totals
 )
 from filters import filter_expenses
+from unittest.mock import patch
+from expenses import remove_expense
 
 class TestReports(unittest.TestCase):
     def test_calculate_total(self):
@@ -100,6 +102,71 @@ class TestReports(unittest.TestCase):
         expenses = []
         result = calculate_category_totals(expenses)
         self.assertEqual(result, {})
+
+    def test_remove_expense(self):
+        expenses = [
+            {"name": "Pizza", "amount": 20.00, "category": "Food"},
+            {"name": "Burger", "amount": 15.00, "category": "Food"},
+            {"name": "Gas", "amount": 40.00, "category": "Transportation"},
+            {"name": "Coffee", "amount": 5.00, "category": "Food"}
+        ]
+        with patch("builtins.input", return_value = "2"):
+            with patch("expenses.save_expenses") as mock_save:
+                remove_expense(expenses)
+
+        self.assertEqual(len(expenses), 3)
+        self.assertEqual(
+            [expense["name"] for expense in expenses],
+            ["Pizza", "Gas", "Coffee"]
+        )
+        mock_save.assert_called_once_with(expenses)
+
+    def test_remove_expense_empty(self):
+        expenses = []
+        
+        with patch("expenses.save_expenses") as mock_save:
+            result = remove_expense(expenses)
+
+        self.assertIsNone(result)
+        self.assertEqual(expenses, [])
+        mock_save.assert_not_called()
+
+    def test_remove_expense_invalid_input(self):
+        expenses = [
+            {"name": "Pizza", "amount": 20.00, "category": "Food"},
+            {"name": "Burger", "amount": 15.00, "category": "Food"}
+        ]
+
+        with patch("builtins.input", return_value = "abc"):
+            with patch("expenses.save_expenses") as mock_save:
+                result = remove_expense(expenses)
+
+        self.assertIsNone(result)
+        self.assertEqual(expenses, [
+            {"name": "Pizza", "amount": 20.00, "category": "Food"},
+            {"name": "Burger", "amount": 15.00, "category": "Food"}
+            ]
+        )
+        mock_save.assert_not_called()
+
+    def test_remove_expense_out_of_range(self):
+        expenses = [
+            {"name": "Pizza", "amount": 20.00, "category": "Food"},
+            {"name": "Burger", "amount": 15.00, "category": "Food"}
+        ]
+
+        with patch("builtins.input", return_value="5"):
+            with patch("expenses.save_expenses") as mock_save:
+                result = remove_expense(expenses)
+
+        self.assertIsNone(result)
+        self.assertEqual(expenses, [
+            {"name": "Pizza", "amount": 20.00, "category": "Food"},
+            {"name": "Burger", "amount": 15.00, "category": "Food"}
+            ]
+        )
+        mock_save.assert_not_called()
+        
 
 if __name__ == "__main__":
     unittest.main()
