@@ -6,8 +6,8 @@ from filters import (
     display_filtered_expenses, 
     display_sorted_expenses
 )
-from ui import display_expenses, get_menu_choice
-from expenses import add_expense
+from ui import display_expenses, get_menu_choice, get_manage_expenses_submenu_choice
+from expenses import add_expense, remove_expense
 from reports import (
     calculate_category_totals,
     display_category_totals,
@@ -20,7 +20,13 @@ def main():
     while True:
         choice = get_menu_choice()
         if choice == '1':
-            add_expense(expenses)
+            submenu_choice = get_manage_expenses_submenu_choice()
+            if submenu_choice == '1':
+                add_expense(expenses)
+            elif submenu_choice == '2':
+                remove_expense(expenses)
+            elif submenu_choice == '3':
+                pass
         elif choice == '2':
             display_expenses(expenses)
         elif choice == '3':

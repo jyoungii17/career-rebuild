@@ -4,7 +4,7 @@ def display_expenses(expenses):
 
 def display_menu():
     print("===== Expense Tracker =====")
-    print("1. Add expense")
+    print("1. Manage expenses")
     print("2. View expenses")
     print("3. View summary")
     print("4. Filter expenses")
@@ -19,3 +19,17 @@ def get_menu_choice():
         if choice in ['1', '2', '3', '4', '5', '6', '7']:
             return choice
         print("Invalid choice. Please enter a number between 1 and 7.")
+
+def display_manage_expenses_submenu():
+    print("===== Manage Expenses =====")
+    print("1. Add expense")
+    print("2. Remove expense")
+    print("3. Back")
+
+def get_manage_expenses_submenu_choice():
+    display_manage_expenses_submenu()
+    while True:
+        choice = input("Enter your choice (1-3): ")
+        if choice in ['1', '2', '3']:
+            return choice
+        print("Invalid choice. Please enter a number between 1 and 3.")
