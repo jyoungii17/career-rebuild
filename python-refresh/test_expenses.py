@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 from reports import (
     calculate_total, 
     find_largest_expense, 
@@ -7,7 +8,7 @@ from reports import (
 )
 from filters import filter_expenses
 from unittest.mock import patch
-from expenses import remove_expense
+from expenses import remove_expense, add_expense
 
 class TestReports(unittest.TestCase):
     def test_calculate_total(self):
@@ -78,8 +79,7 @@ class TestReports(unittest.TestCase):
         result = find_smallest_expense(expenses)
 
         self.assertEqual(result["name"], "Coffee")
-        self.assertEqual(result["amount"], 5.00)
-        
+        self.assertEqual(result["amount"], 5.00)        
     def test_find_smallest_expense_empty(self):
         expenses = []
 
@@ -103,6 +103,7 @@ class TestReports(unittest.TestCase):
         result = calculate_category_totals(expenses)
         self.assertEqual(result, {})
 
+class TestRemoveExpense(unittest.TestCase):
     def test_remove_expense(self):
         expenses = [
             {"name": "Pizza", "amount": 20.00, "category": "Food"},
@@ -120,7 +121,6 @@ class TestReports(unittest.TestCase):
             ["Pizza", "Gas", "Coffee"]
         )
         mock_save.assert_called_once_with(expenses)
-
     def test_remove_expense_empty(self):
         expenses = []
         
@@ -130,7 +130,6 @@ class TestReports(unittest.TestCase):
         self.assertIsNone(result)
         self.assertEqual(expenses, [])
         mock_save.assert_not_called()
-
     def test_remove_expense_invalid_input(self):
         expenses = [
             {"name": "Pizza", "amount": 20.00, "category": "Food"},
@@ -148,7 +147,6 @@ class TestReports(unittest.TestCase):
             ]
         )
         mock_save.assert_not_called()
-
     def test_remove_expense_out_of_range(self):
         expenses = [
             {"name": "Pizza", "amount": 20.00, "category": "Food"},
@@ -166,7 +164,19 @@ class TestReports(unittest.TestCase):
             ]
         )
         mock_save.assert_not_called()
-        
+
+class TestAddExpense(unittest.TestCase):
+    def test_add_expense(self):
+        expenses = []
+        today = date.today().isoformat()
+        with patch("builtins.input", side_effect=["Pizza", "20", "Food"]):
+            with patch("expenses.save_expenses") as mock_save:
+                add_expense(expenses)
+        self.assertEqual(expenses[0]["name"], "Pizza")
+        self.assertEqual(expenses[0]["amount"], 20.00)
+        self.assertEqual(expenses[0]["category"], "Food")
+        self.assertEqual(expenses[0]["date"], date.today().isoformat())
+        mock_save.assert_called_once_with(expenses)
 
 if __name__ == "__main__":
     unittest.main()
