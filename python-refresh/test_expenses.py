@@ -9,6 +9,7 @@ from reports import (
 from filters import filter_expenses
 from unittest.mock import patch
 from expenses import remove_expense, add_expense
+from validation import validate_name, validate_amount, validate_category
 
 class TestReports(unittest.TestCase):
     def test_calculate_total(self):
@@ -164,7 +165,6 @@ class TestRemoveExpense(unittest.TestCase):
             ]
         )
         mock_save.assert_not_called()
-
 class TestAddExpense(unittest.TestCase):
     def test_add_expense(self):
         expenses = []
@@ -178,5 +178,36 @@ class TestAddExpense(unittest.TestCase):
         self.assertEqual(expenses[0]["date"], date.today().isoformat())
         mock_save.assert_called_once_with(expenses)
 
+class TestValidation(unittest.TestCase):
+    def test_validate_name(self):
+        with patch("builtins.input", return_value="Pizza"):
+            result =  validate_name()
+
+        self.assertEqual(result, "Pizza")
+    def test_validate_name_rejects_blank(self):
+        with patch("builtins.input", side_effect=["", "   ", "Pizza"]):
+            result = validate_name()
+
+        self.assertEqual(result, "Pizza")
+    def test_validate_amount(self):
+        with patch("builtins.input", return_value="25.50"):
+            result = validate_amount()
+
+        self.assertEqual(result, 25.50)
+    def test_validate_amount_rejects_invalid_inputs(self):
+        with patch("builtins.input", side_effect=["abc", "0", "-5", "25.50"]):
+            result = validate_amount()
+
+        self.assertEqual(result, 25.50)
+    def test_validate_category(self):
+        with patch("builtins.input", return_value="Food"):
+            result = validate_category()
+
+        self.assertEqual(result, "Food")
+    def test_validate_category_rejects_blank(self):
+        with patch("builtins.input", side_effect=["", "   ", "Food"]):
+            result = validate_category()
+
+        self.assertEqual(result, "Food")
 if __name__ == "__main__":
     unittest.main()
