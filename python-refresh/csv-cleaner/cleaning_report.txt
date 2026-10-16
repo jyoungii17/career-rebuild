@@ -1,0 +1,9 @@
+Cleaning Report
+Input rows: 7
+Kept rows: 2
+Rejected rows: 5
+Duplicate rows: 1
+Blank customers: 1
+Blank emails: 1
+Invalid totals: 1
+Negative totals: 1

@@ -1,0 +1,8 @@
+customer,email,order_total
+"  Northwind Cafe  "," orders@northwind.test ","125.50"
+"Lakeview Books"," ","89.99"
+"Riverside Market","billing@riverside.test","twenty"
+"Acme Supply"," billing@acme.test "," 42.00 "
+"Acme Supply"," billing@acme.test "," 42.00 "
+"   ","empty@customer.test","15.00"
+"Westside Books","orders@westside.test","-8.50"
